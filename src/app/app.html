@@ -1,0 +1,108 @@
+<div class="app-container">
+  <!-- Header -->
+  <header class="header">
+    <h1>AI Agent Console</h1>
+  </header>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <!-- Left Column - Conversations List -->
+    <div class="conversations-panel">
+      <h2>Conversations</h2>
+      <div class="conversations-list">
+        <div 
+          *ngFor="let conversation of conversations" 
+          class="conversation-item"
+          [class.selected]="selectedConversation?.id === conversation.id"
+          (click)="selectConversation(conversation)">
+          <div class="conversation-header">
+            <span class="conversation-title">{{ conversation.title }}</span>
+            <span class="status-badge" [class]="'status-' + conversation.status.toLowerCase()">
+              {{ conversation.status }}
+            </span>
+          </div>
+          <div class="conversation-timestamp">{{ conversation.lastUpdated }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column - Active Chat -->
+    <div class="chat-panel">
+      <div *ngIf="selectedConversation" class="chat-content">
+        <!-- Chat Header -->
+        <div class="chat-header">
+          <h2>{{ selectedConversation.title }}</h2>
+        </div>
+
+        <!-- System Prompt -->
+        <div class="system-prompt">
+          <label>System Prompt</label>
+          <textarea readonly [value]="selectedConversation.systemPrompt" placeholder="No system prompt defined"></textarea>
+        </div>
+
+        <!-- Chat History -->
+        <div class="chat-history" #chatHistory>
+          <div 
+            *ngFor="let message of selectedConversation.messages" 
+            class="message"
+            [class.user-message]="message.sender === 'User'"
+            [class.agent-message]="message.sender === 'Agent'">
+            <div class="message-header">
+              <span class="sender">{{ message.sender }}</span>
+              <span class="timestamp">{{ message.timestamp }}</span>
+            </div>
+            <div class="message-text">{{ message.text }}</div>
+          </div>
+        </div>
+
+        <!-- Agent Metadata -->
+        <div class="agent-metadata">
+          <h3>Agent Run Metadata</h3>
+          <div class="metadata-grid">
+            <div class="metadata-item">
+              <span class="key">Model</span>
+              <span class="value">{{ agentMetadata.model }}</span>
+            </div>
+            <div class="metadata-item">
+              <span class="key">Latency</span>
+              <span class="value">{{ agentMetadata.latency }}</span>
+            </div>
+            <div class="metadata-item">
+              <span class="key">Tokens Used</span>
+              <span class="value">{{ agentMetadata.tokensUsed }}</span>
+            </div>
+            <div class="metadata-item">
+              <span class="key">Temperature</span>
+              <span class="value">{{ agentMetadata.temperature }}</span>
+            </div>
+            <div class="metadata-item">
+              <span class="key">Max Tokens</span>
+              <span class="value">{{ agentMetadata.maxTokens }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="input-area">
+          <textarea 
+            [(ngModel)]="newMessage" 
+            placeholder="Type your message... (Ctrl+Enter to send)"
+            (keydown.enter)="onEnterKey($any($event))"
+            rows="1"></textarea>
+          <button (click)="sendMessage()" [disabled]="!newMessage.trim()">
+            <span>Send</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-left: 0.5rem;">
+              <path d="M2 21L23 12L2 3V10L17 12L2 14V21Z" fill="currentColor"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div *ngIf="!selectedConversation" class="no-conversation">
+        <div>
+          <p>👋 Select a conversation to start chatting</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
